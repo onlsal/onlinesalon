@@ -47,8 +47,10 @@
               </mat-option>
             </mat-select>
           </mat-form-field>
-          <p><button mat-flat-button color="warn" (click)="insEda()" *ngIf="this.memsrv.flgEx && !this.memsrv.flgEd">枝番(兄弟など)追加</button></p>
-          <p><button mat-flat-button color="accent" (click)="delEda()" *ngIf="this.memsrv.flgEx && this.memsrv.flgEd">枝番追加取消</button></p>
+          <div *ngIf="!memsrv.flgLm && !memsrv.flgBy">
+            <p><button mat-flat-button color="warn" (click)="insEda()" *ngIf="this.memsrv.flgEx && !this.memsrv.flgEd">枝番(兄弟など)追加</button></p>
+            <p><button mat-flat-button color="accent" (click)="delEda()" *ngIf="this.memsrv.flgEx && this.memsrv.flgEd">枝番追加取消</button></p>
+          </div>
         </div>
         <div fxLayout="row" fxLayoutGap="7px">
           <mat-form-field>

@@ -256,11 +256,13 @@ export class HomeComponent implements OnInit {
             }
             if(forms[j].frmid==this.memsrv.form && resdata.length >= forms[j].lim){
               this.memsrv.flgLm=true; 
+              this.form.disable();
             }
             const now:Date=new Date();
             // console.log(forms[j].by);
             if(forms[j].frmid==this.memsrv.form && forms[j].by.getTime() < now.getTime()){
-              this.memsrv.flgBy=true;
+              this.memsrv.flgBy=true; 
+              this.form.disable();
             }
             this.ressrv.subject.next();
           });
