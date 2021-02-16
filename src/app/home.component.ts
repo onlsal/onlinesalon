@@ -176,7 +176,7 @@ export class HomeComponent implements OnInit {
       });
     }else{  
       this.memsrv.flgEx=true;
-      console.log(this.form.get('grp1').value);
+      // console.log(this.form.get('grp1').value);
       this.apollo.watchQuery<any>({
         query: Query.GetQuery3,
         })
@@ -301,7 +301,7 @@ export class HomeComponent implements OnInit {
     // console.log(this.memsrv.member);
     this.upd_tblmem();
     localStorage.setItem('olsalon_pay', this.memsrv.dojo);
-    // window.location.href=this.memsrv.site;
+    window.location.href=this.memsrv.site;
   }
 
   public get_tbldj(dojoid:number):void {
@@ -352,8 +352,8 @@ export class HomeComponent implements OnInit {
       // console.log(eda,this.memsrv.flgSm);
     }      
   }
-  test() {
-    // this.upd_tblmem();
-    console.log(this.memsrv.membs,this.memsrv.member);
-  }
+  // test() {
+  //   // this.upd_tblmem();
+  //   console.log(this.memsrv.membs,this.memsrv.member);
+  // }
 }
