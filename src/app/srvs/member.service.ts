@@ -1,6 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-
+export class Form {
+  frmid:string;
+  date:string;
+  title:string;
+  stim:string;
+  etim:string;
+  wid:string;
+  lim:number;
+  money:number;
+  by:Date;
+  constructor(init?:Partial<Form>) {
+      Object.assign(this, init);
+  }
+}
 export class Member {
   googleid:string;
   memid:number|string;
@@ -39,7 +52,7 @@ export class MemberService {
   public type:string;
   public dojo:string;
   public form:string;
-
+  public frmInfo:Form=new Form();
   //コンポーネント間通信用
   public subject = new Subject<string>();
   public observe = this.subject.asObservable();

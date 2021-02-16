@@ -4,6 +4,7 @@
       <mat-card-actions>
         <p *ngIf="!memsrv.claims"> ページ上部の「sign in with google」ボタンをクリックして、googleアカウントでログインするか、新規アカウントを作成してください </p>
         <div *ngIf="memsrv.claims">
+          <h2>イベント【{{memsrv.frmInfo.title}}】予約申込（開催日：{{memsrv.frmInfo.date}}）</h2>
           <p *ngIf="!memsrv.flgSm && !memsrv.flgLm && !memsrv.flgBy">
             <button mat-flat-button color="accent" (click)="goForm()" [disabled]="parent.form.invalid">予約申込</button>
           </p>

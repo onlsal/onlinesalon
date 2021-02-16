@@ -7,22 +7,7 @@ import * as moment from 'moment';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GoogleDriveProvider } from './prvs/googledrive';
 import { ResultService } from './srvs/result.service';
-import { MemberService } from './srvs/member.service';
-
-class Form {
-  frmid:string;
-  date:string;
-  title:string;
-  stim:string;
-  etim:string;
-  wid:string;
-  lim:number;
-  money:number;
-  by:Date;
-  constructor(init?:Partial<Form>) {
-      Object.assign(this, init);
-  }
-}
+import { MemberService,Form } from './srvs/member.service';
 
 @Component({
   selector: 'app-home',
@@ -31,7 +16,7 @@ class Form {
   providers: [ GoogleDriveProvider ]
 })
 export class HomeComponent implements OnInit {
-  form: FormGroup;
+  public form: FormGroup;
   public TabIndex:number=0;
   constructor(public gDrive: GoogleDriveProvider,
               public ressrv: ResultService,
@@ -254,16 +239,21 @@ export class HomeComponent implements OnInit {
                 });
               }
             }
-            if(forms[j].frmid==this.memsrv.form && resdata.length >= forms[j].lim){
-              this.memsrv.flgLm=true; 
-              this.form.disable();
+            if(forms[j].frmid==this.memsrv.form){
+              this.memsrv.frmInfo=forms[j];
+              if(resdata.length >= forms[j].lim){
+                this.memsrv.flgLm=true; 
+                this.form.disable();
+              }
+              const now:Date=new Date();
+              console.log(forms[j].by,forms[j].by.getTime());
+              console.log(now,now.getTime());
+              if(forms[j].by.getTime() < now.getTime()){
+                this.memsrv.flgBy=true; 
+                this.form.disable();
+              }
             }
-            const now:Date=new Date();
-            // console.log(forms[j].by);
-            if(forms[j].frmid==this.memsrv.form && forms[j].by.getTime() < now.getTime()){
-              this.memsrv.flgBy=true; 
-              this.form.disable();
-            }
+            
             this.ressrv.subject.next();
           });
         }
