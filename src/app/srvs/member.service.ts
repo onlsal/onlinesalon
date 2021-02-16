@@ -3,7 +3,7 @@ import { Subject } from 'rxjs';
 
 export class Member {
   googleid:string;
-  memid:number;
+  memid:number|string;
   eda:number;
   dojoid:number;
   mail:string;
@@ -33,7 +33,8 @@ export class MemberService {
   public flgEd:boolean=false;  //枝番新規登録あり
   public flgSm:boolean=false;  //申込済
   public flgLm:boolean=false;  //定員到達
-  public site:string;
+  public flgBy:boolean=false;  //期限到達
+  public frmFlds:any;
   public djid:number;
   public type:string;
   public dojo:string;

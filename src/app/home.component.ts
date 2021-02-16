@@ -18,6 +18,7 @@ class Form {
   wid:string;
   lim:number;
   money:number;
+  by:Date;
   constructor(init?:Partial<Form>) {
       Object.assign(this, init);
   }
@@ -47,13 +48,11 @@ export class HomeComponent implements OnInit {
     this.route.paramMap.subscribe((params: ParamMap)=>{
       var djtmp:string;
       djtmp = params.get('dojo');
-      // console.log('ngOnInit',this.djid);
       if (djtmp === null){
         this.memsrv.djid = +localStorage.getItem('olsalon_dojo');
       }else{
         this.memsrv.djid = +djtmp;
         this.get_tbldj(this.memsrv.djid);
-        // console.log('ngOnInit set前',this.djid);
         localStorage.setItem('olsalon_dojo', this.memsrv.djid.toString());
       }
       this.memsrv.type = params.get('type');
@@ -94,13 +93,10 @@ export class HomeComponent implements OnInit {
       this.memsrv.member.googleid = this.memsrv.claims.sub;
       this.get_tblmem(this.memsrv.claims);
     }
-    // console.log('googleInit',this.djid);
     this.memsrv.djid = +localStorage.getItem('olsalon_dojo');
-    // console.log("login",this.djid);
     this.get_tbldj(this.memsrv.djid);
     this.memsrv.form = localStorage.getItem('olsalon_form');
     this.memsrv.type = localStorage.getItem('olsalon_type');
-    // console.log("login",this.dojo);
   }
 
   public get_tblmem(loginfo):void {
@@ -120,11 +116,10 @@ export class HomeComponent implements OnInit {
           this.memsrv.member.googleid=loginfo.sub;
           this.memsrv.member.sei=loginfo.family_name;
           this.memsrv.member.mei=loginfo.given_name;
-          // console.log('getmemid前', this.djid);
-          this.memsrv.member.memid=0;
+          this.memsrv.member.memid="新規登録";
           this.memsrv.member.eda=1;
-          this.memsrv.member.class="未登録";
-          // this.member.birth="未登録";
+          this.memsrv.member.class="";
+          this.memsrv.member.birth=null;
           this.memsrv.member.mail=loginfo.email;
           let member1=Object.assign({},this.memsrv.member);//参照ではなく、値を配列に追加
           this.memsrv.membs.push(member1);
@@ -135,20 +130,13 @@ export class HomeComponent implements OnInit {
             let member1=Object.assign({},data.tblmember[i]);//参照ではなく、値を配列に追加
             this.memsrv.membs.push(member1);
           }
-          // this.memsrv.membs = data.tblmember;
           this.memsrv.member = Object.assign({},this.memsrv.membs[0]);
         }
-        // localStorage.setItem('olsalon_mail', this.member.mail); 
-        // localStorage.setItem('olsalon_memid', this.member.memid.toString());
         this.form.get('grp1').patchValue(this.memsrv.member);
-        // this.form.get('grp2').patchValue(this.memsrv.member);
         this.readGdrive();
       });
   }
   public upd_tblmem():void {
-    // console.log(this.memsrv.flgEx,this.form.get('grp1').value);
-    // localStorage.setItem('olsalon_mail', this.member.mail); 
-    // localStorage.setItem('olsalon_memid', this.member.memid.toString());
     if (this.memsrv.flgEx && !this.memsrv.flgEd){
       this.apollo.mutate<any>({
         mutation: Query.UpdateMember,
@@ -176,13 +164,12 @@ export class HomeComponent implements OnInit {
       });
     }else{  
       this.memsrv.flgEx=true;
-      // console.log(this.form.get('grp1').value);
       this.apollo.watchQuery<any>({
         query: Query.GetQuery3,
         })
         .valueChanges
         .subscribe(({ data }) => {
-          if (this.memsrv.member.memid ==null){
+          if (this.memsrv.member.memid=="新規登録"){
             if (data.tblmember_aggregate.aggregate.max.memid==null) {
               this.memsrv.member.memid = 1;
             } else {
@@ -212,7 +199,6 @@ export class HomeComponent implements OnInit {
             },
           }).subscribe(({ data }) => {
             console.log('InsertMember', data);
-            // this.memsrv.member.memid=data.insert_tblmember_one.memid;
           },(error) => {
             console.log('error InsertMember', error);
           });
@@ -225,29 +211,33 @@ export class HomeComponent implements OnInit {
     this.gDrive.load( fileId ,'od6')
     .then( ( data :any) => {
       const idx:number= data.findIndex(e => e.dojoid == this.memsrv.djid);
-      // console.log(idx,data[idx]);
       const spread:string=data[idx].spread;
       this.gDrive.load( spread, data[idx].wid)
       .then( ( data :any) => {
         this.memsrv.flgLm=false; 
         let forms:Form[]=[];
-        // console.log(data);
         for (let i=0;i<data.length;i++){
+          let lcby:Date;
+          if (data[i]['申込期限未入力の場合、当日も可']==null){
+            lcby=moment(data[i]['開催日'],'YYYY/MM/DD').toDate();
+          } else { 
+            lcby=moment(data[i]['申込期限未入力の場合、当日も可'],'YYYY/MM/DD').toDate(); 
+          }
           forms.push({
             frmid:data[i]['formid'],        
             date :data[i]['開催日'],
             title:data[i]['予約フォームタイトル'],
             stim :data[i]['開始時間24時間表示で入力'],
             etim :data[i]['終了時間24時間表示で入力'],
-            lim  :data[i]['定員(数字のみ入力)'],
+            lim  :data[i]['定員数字のみ入力'],
             wid  :data[i].wid,
-            money:+data[i]['金額'],   
-          });
+            money:+data[i]['金額'],
+            by:lcby
+          }); 
         }
-        // console.log(forms,this.mail);
         for (let j=0;j<forms.length;j++){
           this.gDrive.load( spread, forms[j].wid)  
-          .then( ( data :any) => {
+          .then( ( resdata :any) => {
             for (let k=0;k<data.length;k++){
               if (data[k]['メールアドレス']==this.memsrv.member.mail){
                 this.ressrv.lists.push({
@@ -256,16 +246,21 @@ export class HomeComponent implements OnInit {
                   title:forms[j].title,
                   stim :forms[j].stim,
                   etim :forms[j].etim,
-                  memid:data[k]['予約者番号'],
-                  eda  :data[k]['予約者枝番'],
-                  sei  :data[k]['参加者姓'],
-                  mei  :data[k]['参加者名'],
+                  memid:resdata[k]['予約者番号'],
+                  eda  :resdata[k]['予約者枝番'],
+                  sei  :resdata[k]['参加者姓'],
+                  mei  :resdata[k]['参加者名'],
                   money:forms[j].money
                 });
               }
             }
-            if(forms[j].frmid==this.memsrv.form && data.length >= forms[j].lim){
+            if(forms[j].frmid==this.memsrv.form && resdata.length >= forms[j].lim){
               this.memsrv.flgLm=true; 
+            }
+            const now:Date=new Date();
+            // console.log(forms[j].by);
+            if(forms[j].frmid==this.memsrv.form && forms[j].by.getTime() < now.getTime()){
+              this.memsrv.flgBy=true;
             }
             this.ressrv.subject.next();
           });
@@ -279,15 +274,7 @@ export class HomeComponent implements OnInit {
         })
         .valueChanges
         .subscribe(({ data }) => {
-          // console.log(data,data.tblfrmfld_by_pk); 
-          this.memsrv.site = "https://docs.google.com/forms/d/" + this.memsrv.form + "/viewform?usp=pp_url" 
-          + "&entry." + data.tblfrmfld_by_pk.mail + "=" + this.memsrv.member.mail 
-          + "&entry." + data.tblfrmfld_by_pk.memid + "=" + this.memsrv.member.memid
-          + "&entry." + data.tblfrmfld_by_pk.eda + "=" + this.memsrv.member.eda
-          + "&entry." + data.tblfrmfld_by_pk.sei + "=" + this.form.get('grp1').value.sei
-          + "&entry." + data.tblfrmfld_by_pk.mei  + "=" + this.form.get('grp1').value.mei
-          + "&entry." + data.tblfrmfld_by_pk.birth + "=" + moment(this.form.get('grp1').value.birth).format("YYYY-MM-DD") 
-          + "&entry." + data.tblfrmfld_by_pk.class + "=" + this.form.get('grp1').value.class;
+          this.memsrv.frmFlds=data.tblfrmfld_by_pk; 
         },(error) => {
           console.log('error get_frmfld', error);
         });
@@ -298,10 +285,16 @@ export class HomeComponent implements OnInit {
   }
 
   goForm(){
-    // console.log(this.memsrv.member);
     this.upd_tblmem();
     localStorage.setItem('olsalon_pay', this.memsrv.dojo);
-    window.location.href=this.memsrv.site;
+    window.location.href = "https://docs.google.com/forms/d/" + this.memsrv.form + "/viewform?usp=pp_url" 
+    + "&entry." + this.memsrv.frmFlds.mail + "=" + this.memsrv.member.mail 
+    + "&entry." + this.memsrv.frmFlds.memid + "=" + this.memsrv.member.memid
+    + "&entry." + this.memsrv.frmFlds.eda + "=" + this.memsrv.member.eda
+    + "&entry." + this.memsrv.frmFlds.sei + "=" + this.form.get('grp1').value.sei
+    + "&entry." + this.memsrv.frmFlds.mei  + "=" + this.form.get('grp1').value.mei
+    + "&entry." + this.memsrv.frmFlds.birth + "=" + moment(this.form.get('grp1').value.birth).format("YYYY-MM-DD") 
+    + "&entry." + this.memsrv.frmFlds.class + "=" + this.form.get('grp1').value.class;
   }
 
   public get_tbldj(dojoid:number):void {
@@ -314,15 +307,11 @@ export class HomeComponent implements OnInit {
       .valueChanges
       .subscribe(({ data }) => {
         this.memsrv.dojo = data.tblowner[0].dojoname;
-        // console.log(data,data.tblowner.dojoname);
       },(error) => {
         console.log('error get_tbldj', error);
       });
   }
   insEda():void {
-    // console.log(this.memsrv.member,this.memsrv.flgEx);
-    // console.log(this.memsrv.membs,this.memsrv.member);
-
     this.upd_tblmem();
     let eda:number[] = this.memsrv.membs.map(function (p) {
       return p.eda;
@@ -331,25 +320,21 @@ export class HomeComponent implements OnInit {
     this.memsrv.member.eda=Math.max.apply(null, eda)+1;
     this.memsrv.member.class="";
     this.memsrv.member.birth=null;
-    // console.log(this.memsrv.membs);
     let member1=Object.assign({},this.memsrv.member);//参照ではなく、値を配列に追加
     this.memsrv.membs.push(member1);
     this.changeEda(this.memsrv.member.eda);
     this.memsrv.flgEd=true;
     this.form.get('grp1').get('eda').disable();
-    // console.log('insEda',this.memsrv);
   }
   changeEda(eda:number):void {
     this.memsrv.member = Object.assign({},this.memsrv.membs.find(e => e.eda === eda));
     this.form.get('grp1').patchValue(this.memsrv.member);
-    // this.form.get('grp2').patchValue(this.memsrv.member);
     for (let i=0;i<this.ressrv.lists.length;i++){
       this.memsrv.flgSm=false;
       if (this.ressrv.lists[i].memid==this.memsrv.member.memid && this.ressrv.lists[i].eda==eda && this.ressrv.lists[i].frmid==this.memsrv.form ){
         this.memsrv.flgSm=true;
         break;
       }
-      // console.log(eda,this.memsrv.flgSm);
     }      
   }
   // test() {

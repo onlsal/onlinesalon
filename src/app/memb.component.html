@@ -8,21 +8,24 @@
         <mat-card-actions>
           <p *ngIf="!memsrv.claims"> ページ上部の「sign in with google」ボタンをクリックして、googleアカウントでログインするか、新規アカウントを作成してください </p>
           <div *ngIf="memsrv.claims">
-            <p *ngIf="!memsrv.flgSm && !memsrv.flgLm">
+            <p *ngIf="!memsrv.flgSm && !memsrv.flgLm && !memsrv.flgBy">
               <button mat-flat-button color="accent" (click)="goForm()" [disabled]="parent.form.invalid">予約申込</button>
             </p>
             <p *ngIf="parent.form.invalid">
               *印の項目にすべて入力してください。
             </p>
             <p *ngIf="memsrv.flgSm">
-              表示中の会員枝番で予約申込済です。
+              表示中の予約者枝番で予約申込済です。
             </p>
-            <p *ngIf="memsrv.flgLm">
+            <p *ngIf="memsrv.flgBy">
+              本イベントの申込受付期限を過ぎております。またのご利用をお待ちしております。
+            </p>
+            <p *ngIf="memsrv.flgLm && !memsrv.flgBy">
               誠に申し訳ありませんが、本イベントは定員に達しました。またのご利用をお待ちしております。
             </p>
           </div>
         </mat-card-actions>  
-        <mat-card-content *ngIf="memsrv.claims"  fxLayoutGap="7px">       
+        <mat-card-content *ngIf="memsrv.claims">       
         <div fxLayout="row" fxLayoutGap="7px">
           <mat-form-field>
             <mat-label>メール</mat-label>
@@ -47,63 +50,55 @@
           <p><button mat-flat-button color="warn" (click)="insEda()" *ngIf="this.memsrv.flgEx && !this.memsrv.flgEd">枝番(兄弟など)追加</button></p>
           <p><button mat-flat-button color="accent" (click)="delEda()" *ngIf="this.memsrv.flgEx && this.memsrv.flgEd">枝番追加取消</button></p>
         </div>
-        <mat-form-field>
-          <mat-label>姓</mat-label>
-          <input matInput formControlName="sei" required>
-        </mat-form-field>
-        <mat-form-field >
-          <mat-label>名</mat-label>
-          <input matInput formControlName="mei" required>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>クラス</mat-label>
-          <input matInput formControlName="class">
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>生年月日</mat-label>
-          <!-- <input matInput [(ngModel)]="member.birth" name="bir"> -->
-          <!-- <div class="date-input-container"> -->
-            <input matInput [matDatepicker]="picker" formControlName="birth" required>
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <mat-datepicker #picker></mat-datepicker>
-          <!-- </div> -->
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>電話番号</mat-label>
-          <input matInput formControlName="tel">
-        </mat-form-field>
-      <!-- </form>
-      <form formGroupName="grp2" class="container" ngNativeValidate ybAddress (submit)="false" [ybAutocompleteMode]="'off'" #address="ybAddress" fxLayout="row" fxLayoutGap="7px"> -->
-        <mat-form-field>
-          <mat-label>郵便番号</mat-label>
-          <input matInput formControlName="zip" ybPostalCode required>
-          <button mat-button matSuffix mat-stroked-button aria-label="get" (click)="address.complete()">
-            住所補完
-          </button>
-        </mat-form-field>
-      
-        <mat-form-field>
-          <mat-label>都道府県</mat-label>
-          <input matInput formControlName="region" ybRegion required>
-        </mat-form-field>
-      
-        <mat-form-field>
-          <mat-label>市区町村</mat-label>
-          <input matInput formControlName="local" ybLocality required>
-        </mat-form-field>
-      
-        <mat-form-field>
-          <mat-label>町名・番地</mat-label>
-          <input matInput formControlName="street" ybStreet required>
-        </mat-form-field>
-      
-        <mat-form-field>
-          <mat-label>マンション・ビル名</mat-label>
-          <input matInput formControlName="extend" ybExtended>
-        </mat-form-field>
-        <!-- <button mat-flat-button (click)="upd_tblmem()">{{ flgEx == true ? 'ユーザ情報変更' : 'ユーザ情報登録' }}</button> -->
+        <div fxLayout="row" fxLayoutGap="7px">
+          <mat-form-field>
+            <mat-label>姓</mat-label>
+            <input matInput formControlName="sei" required>
+          </mat-form-field>
+          <mat-form-field >
+            <mat-label>名</mat-label>
+            <input matInput formControlName="mei" required>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>クラス</mat-label>
+            <input matInput formControlName="class">
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>生年月日</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="birth" required>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>電話番号</mat-label>
+            <input matInput formControlName="tel">
+          </mat-form-field>
+        </div>       
+        <div fxLayout="row" fxLayoutGap="7px">
+          <mat-form-field>
+            <mat-label>郵便番号</mat-label>
+            <input matInput formControlName="zip" ybPostalCode required>
+            <button mat-button matSuffix mat-stroked-button aria-label="get" (click)="address.complete()">
+              住所補完
+            </button>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>都道府県</mat-label>
+            <input matInput formControlName="region" ybRegion required>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>市区町村</mat-label>
+            <input matInput formControlName="local" ybLocality required>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>町名・番地</mat-label>
+            <input matInput formControlName="street" ybStreet required>
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>マンション・ビル名</mat-label>
+            <input matInput formControlName="extend" ybExtended>
+          </mat-form-field>
+        </div>
       </mat-card-content>
     </form>
-
-
   </mat-card>
