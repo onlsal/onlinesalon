@@ -1,9 +1,5 @@
 <mat-card>
-  <mat-card-title>  
-    <h2>空手オンラインサロン予約 登録者情報（ {{memsrv.dojo}} ）</h2>
-    <!-- <button mat-flat-button color="warn" (click)="upd_tblmem()">決済</button>   -->
-    <!-- <button mat-flat-button color="warn" (click)="test(thisForm)">test</button> -->
-  </mat-card-title>  
+  
   <form formGroupName="grp1" class="container" ngNativeValidate ybAddress (ngSubmit)="false" [ybAutocompleteMode]="'off'" #address="ybAddress">
       <mat-card-actions>
         <p *ngIf="!memsrv.claims"> ページ上部の「sign in with google」ボタンをクリックして、googleアカウントでログインするか、新規アカウントを作成してください </p>
@@ -24,7 +20,12 @@
         <p *ngIf="memsrv.flgBy">
           本イベントの申込受付期限を過ぎております。またのご利用をお待ちしております。
         </p>
-      </mat-card-actions>  
+      </mat-card-actions>
+      <mat-card-title>  
+        <h2>空手オンラインサロン予約 登録者情報（ {{memsrv.dojo}} ）</h2>
+        <!-- <button mat-flat-button color="warn" (click)="upd_tblmem()">決済</button>   -->
+        <!-- <button mat-flat-button color="warn" (click)="test(thisForm)">test</button> -->
+      </mat-card-title>
       <mat-card-content *ngIf="memsrv.claims">       
         <div fxLayout="row" fxLayoutGap="7px">
           <mat-form-field>
