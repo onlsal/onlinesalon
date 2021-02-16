@@ -9,7 +9,7 @@ export class Member {
   mail:string;
   sei:string;
   mei:string;
-  birth:Date;
+  birth:Date | null;
   class:string;
   tel:string;
   zip:string;
@@ -18,6 +18,7 @@ export class Member {
   street:string;
   extend:string;
   constructor(init?:Partial<Member>) {
+      this.birth = null;
       Object.assign(this, init);
   }
 }
@@ -28,8 +29,11 @@ export class MemberService {
   public claims:any;
   public member:Member=new Member();
   public membs :Member[]=[];
-  public flgEx:boolean=false;
-  public flgSm:boolean=false;
+  public flgEx:boolean=false;  //メンバー登録済
+  public flgEd:boolean=false;  //枝番新規登録あり
+  public flgSm:boolean=false;  //申込済
+  public flgLm:boolean=false;  //定員到達
+  public site:string;
   public djid:number;
   public type:string;
   public dojo:string;

@@ -7,6 +7,7 @@ export class List {
   title:string;
   stim:string;
   etim:string;
+  memid:number;
   eda:number;
   sei:string;
   mei:string;
@@ -24,6 +25,6 @@ export class ResultService {
   public observe = this.subject.asObservable();
 
   public lists:List[]=[];
-
+  
   constructor() { }
 }

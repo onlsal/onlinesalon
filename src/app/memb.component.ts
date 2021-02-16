@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormGroupDirective, FormGroup, FormControl, Validators, ControlContainer } from '@angular/forms';
 import { MemberService } from './srvs/member.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-memb',
@@ -12,8 +13,9 @@ export class MembComponent implements OnInit {
   @Output() action = new EventEmitter();
   @Output() action2 = new EventEmitter();
   @Output() action3 = new EventEmitter();
+
   constructor(public memsrv: MemberService,
-              private parent: FormGroupDirective) {
+              public parent: FormGroupDirective) {
 
                }
 
@@ -25,9 +27,7 @@ export class MembComponent implements OnInit {
       mei: new FormControl('', Validators.required),
       class: new FormControl(''),
       birth: new FormControl('', Validators.required),
-      tel: new FormControl('')
-    })); 
-    form.addControl('grp2', new FormGroup({
+      tel: new FormControl(''),
       zip: new FormControl('', Validators.required),
       region: new FormControl('', Validators.required),
       local: new FormControl('', Validators.required),
@@ -36,7 +36,7 @@ export class MembComponent implements OnInit {
     })); 
 
   }
-　goForm():void {
+  goForm():void {
     this.action.emit();
   }
   insEda():void {
@@ -45,4 +45,13 @@ export class MembComponent implements OnInit {
   changeEda(eda:number):void {
     this.action3.emit(eda);
   }
+  delEda():void {
+    this.memsrv.flgEd=false;
+    this.memsrv.membs.pop();
+    this.changeEda(1);
+    this.parent.form.get('grp1').get('eda').enable();
+  }
+  // test(thisForm:any){
+  //   console.log(thisForm,this.parent.form);
+  // }
 }

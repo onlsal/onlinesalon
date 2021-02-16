@@ -15,7 +15,7 @@ import { stringify } from '@angular/compiler/src/util';
 
 export class GraphQLModule {
   constructor(apollo: Apollo, httpLink: HttpLink) {
-    const uri = 'https://onlsaltbl.herokuapp.com/v1/graphql';
+    const uri = 'https://salsystbl.herokuapp.com/v1/graphql';
 
     const authHeader = new HttpHeaders()
     .set('X-Hasura-Access-Key', 'something_secret')

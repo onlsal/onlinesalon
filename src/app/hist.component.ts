@@ -79,6 +79,7 @@ export class HistComponent implements OnInit {
   
   // }
   deleteRow(i:number):void{
+    
 
   }
   refresh(): void {

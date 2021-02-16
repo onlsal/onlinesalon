@@ -29,8 +29,8 @@ query get_dojo($did: Int!) {
 }`;
 
 export const GetQuery3 = gql`
-query calc_memid($did: Int!) {
-  tblmember_aggregate(where: {dojoid: {_eq: $did}}) {
+query calc_memid {
+  tblmember_aggregate {
     aggregate {
       max {
         memid
@@ -40,8 +40,8 @@ query calc_memid($did: Int!) {
 }`;
 
 export const UpdateMember = gql`
-mutation upd_member($_set: tblmember_set_input!, $id: Int!, $gid: String!,$eda: Int!) {
-  update_tblmember_by_pk(pk_columns: {dojoid: $id,googleid: $gid,eda: $eda}, _set: $_set) {
+mutation upd_member($_set: tblmember_set_input!, $memid: Int!,$eda: Int!) {
+  update_tblmember_by_pk(pk_columns: {eda: $eda,memid: $memid}, _set: $_set) {
     memid
     googleid
   }
